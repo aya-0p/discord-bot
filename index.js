@@ -151,7 +151,7 @@ client.on('messageCreate', (message) => { //メッセージが作られたとき
   if ( message.author.bot ) { //bot無視
     return;
   }
-  if (process.env.logall) {log2(`message received\nmessaged by ${message.author.username} at ${message.createdAt.toFormat("YYYY年MM月DD日HH24時MI分SS秒")} in ${message.channel.name},\n${message.content}`, "debug")}
+  if (process.env.logall === "true") {log2(`message received\nmessaged by ${message.author.username} at ${message.createdAt.toFormat("YYYY年MM月DD日HH24時MI分SS秒")} in ${message.channel.name},\n${message.content}`, "debug")}
   if ( readCh == message.channelId && vcConnecting ) { postMsgVoice(message); } //ボイスチャンネルで読み上げ
   const autorep = autoReply(message.content)
   if (autorep[1]) {
