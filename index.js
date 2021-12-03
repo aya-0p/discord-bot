@@ -10,11 +10,12 @@ let settings = require("./settings.json")
 const { log2 } = require("./scripts/log.js")
 const { changeVoice } = require("./scripts/change_voice.js")
 const { autoReply } = require("./scripts/autoreply.js")
+const { download } = require("./scripts/download.js")
 let connection,readCh,player,reading = false,dataName = [],vcConnecting = false,readText = [],gening = false
 dotenv.config();
 const rpc = axios.create({ baseURL: process.env.voicevox_url, proxy:false});
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_PRESENCES] })
-fs.remove('tmp', () => {fs.mkdir('tmp', () => {});});
+fs.remove('tmp', () => {fs.mkdir('tmp',{ recursive: true }, () => {});});
 rpc.get("/version").then(() => {}).catch(() => {console.log("Install and run VOICEVOX.");process.exit(1);})
 
 
@@ -152,7 +153,17 @@ client.on('messageCreate', (message) => { //メッセージが作られたとき
   if ( message.author.bot ) { //bot無視
     return;
   }
-  if (process.env.logall === "true") {log2(`message received\nmessaged by ${message.author.username} at ${message.createdAt.toFormat("YYYY年MM月DD日HH24時MI分SS秒")} in ${message.channel.name},\n${message.content}`, "debug")}
+  if (process.env.logall === "true") {
+    log2(`message received\nmessaged by ${message.author.username} at ${message.createdAt.toFormat("YYYY年MM月DD日HH24時MI分SS秒")} in ${message.channel.name},\n${message.content}`, "debug")
+    const attachedFileUrl = message.attachments?.map(attachment => attachment.url)
+    if (attachedFileUrl[0] !== undefined) {
+      log2(`attachments,\n${attachedFileUrl.join("\\n")}`,"debug")
+      for (let i=0;i<attachedFileUrl.length;i++) {
+        var fileName = attachedFileUrl[i].match(".+/(.+?)([\?#;].*)?$")[1];
+        download(attachedFileUrl[i],fileName,i)
+      }
+    }
+  }
   if ( readCh == message.channelId && vcConnecting ) { postMsgVoice(message); } //ボイスチャンネルで読み上げ
   const autorep = autoReply(message.content)
   if (autorep[1]) {
