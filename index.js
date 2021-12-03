@@ -15,6 +15,7 @@ dotenv.config();
 const rpc = axios.create({ baseURL: process.env.voicevox_url, proxy:false});
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_PRESENCES] })
 fs.remove('tmp', () => {fs.mkdir('tmp', () => {});});
+rpc.get("/version").then(() => {}).catch(() => {console.log("Install and run VOICEVOX.");process.exit(1);})
 
 
 async function postMsgVoice(message) { //受け取ったメッセージを読み上げ用に変換して genAudio()
