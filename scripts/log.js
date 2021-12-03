@@ -27,7 +27,7 @@ exports.log2 = function log2(data, stt) { //log2(): ログを色付きで表示�
     if (i == 0) {bdy = `(${(i+1).toString().padStart(2,"0")}/${b.length.toString().padStart(2,"0")}) ${b[i]}`} 
     else {bdy = `\x1b[2m(${(i+1).toString().padStart(2,"0")}/${b.length.toString().padStart(2,"0")}) ${b[i]}\x1b[0m`}
     let bo = `${d} | ${status}: \u001b[0m${bdy}`
-    if (debug || status !== "debug") { console.log(bo) }
+    if (debug === "true" || status !== "debug") { console.log(bo) }
     try {
       bu = `${d} | ${stt}: (${(i+1).toString().padStart(2,"0")}/${b.length.toString().padStart(2,"0")}) ${b[i].replaceAll(/\x1b\[../g,"")}`
       fs.appendFileSync('.log', `${bu}\n`, 'utf8')
