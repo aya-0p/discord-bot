@@ -1,6 +1,6 @@
 <!-- 
 botの使い方
-ここへのページをbotの説明文に貼ると便利
+ここへのページ(https://github.com/*username*/discord-bot/blob/main/How-to-use.md)をbotの説明文に貼ると便利
  -->
 # aya's bot<!-- 作者名 -->
 botの使い方です。  
