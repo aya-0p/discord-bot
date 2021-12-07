@@ -21,5 +21,13 @@ botの使い方です。
 ### after
 読み替えた後の語
 ### regex
-省略可
+省略可  
 正規表現を利用する
+## /ch_default_voice [id], /ch_my_voice [id]
+デフォルトの、実行者の読み上げ音声を変更
+### id
+読み上げ者名(VOICEVOXに存在するもののみ選択可)
+## 自動返信
+現在は設定なし
+## メッセージURLからメッセージを表示
+`https://discord.com/channels/(number)/(number)/(number)` のようなメッセージURLからメッセージを表示する
