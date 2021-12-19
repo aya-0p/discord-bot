@@ -34,6 +34,7 @@ function genWords(message) { //メッセージを置き換え
   settings.replaces.text.forEach(t => {
     returnMessage1 = returnMessage1.replaceAll(t.before,t.after)
   })
+  returnMessage1 = returnMessage1.replaceAll("\n","")
   const returnMessage = returnMessage1
   return(returnMessage)
 }
@@ -222,7 +223,7 @@ client.on("interactionCreate", async (interaction) => { //interaction(/)
   if ( interaction.commandName === 'ch_default_voice' ) {
     settings = changeVoice(interaction.options.getString("id"), settings)
     interaction.reply({content: `デフォルトの声を変更しました`,})
-    log2(`changed default voice to id:${interaction.options.getNugetStringmber("id")}`,"info")
+    log2(`changed default voice to id:${interaction.options.getString("id")}`,"info")
   }
 
   if ( interaction.commandName === 'ch_my_voice' ) {
