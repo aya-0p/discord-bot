@@ -35,6 +35,8 @@ function genWords(message) { //メッセージを置き換え
     returnMessage1 = returnMessage1.replaceAll(t.before,t.after)
   })
   returnMessage1 = returnMessage1.replaceAll("\n","")
+  const reg = new RegExp("https?://[\\w!\\?/\\+\\-_~=;\\.,\\*&@#\\$%\\(\\)'\\[\\]]+", "g")
+  returnMessage1 = returnMessage1.replaceAll(reg, "")
   const returnMessage = returnMessage1
   return(returnMessage)
 }
