@@ -1,0 +1,12 @@
+{
+  "name": "delword",
+  "description": "読み替えを削除する",
+  "options": [
+    {
+      "type": "STRING",
+      "name": "word",
+      "description": "削除する文字",
+      "required": true
+    }
+  ]
+}
