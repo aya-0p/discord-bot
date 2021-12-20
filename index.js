@@ -62,12 +62,12 @@ async function genAudio() { //readText内の文字を読み上げデータに変
 
 async function saveAndSpeak(data,text) { //genAudio()からのデータをいったん*.wavにした後、*.mp3に変換しspeak()
   const fileName = (new Date()).toFormat("YYYY-MM-DD_HH24-MI-SS");
-  log2(`\x1b[2mgenerated audio, ${text.substring(0, 10)}...\x1b[0m => D:\\Bot\\tmp\\${fileName}.wav`,"debug")
+  log2(`\x1b[2mgenerated audio, ${text.substring(0, 10)}...\x1b[0m => tmp\\${fileName}.wav`,"debug")
   fs.writeFileSync(`tmp/${fileName}.wav`, new Buffer.from(data), 'binary')
   ffmpeg(`tmp/${fileName}.wav`)
     .toFormat("mp3")
     .on('end', async () => {
-      log2(`\x1b[2mgenerated audio, ${text.substring(0, 10)}... => D:\\Bot\\tmp\\${fileName}.wav\x1b[0m => D:\\Bot\\tmp\\${fileName}.mp3`,"debug")
+      log2(`\x1b[2mgenerated audio, ${text.substring(0, 10)}... => tmp\\${fileName}.wav\x1b[0m => tmp\\${fileName}.mp3`,"debug")
       dataName.push(fileName)
       if (!reading) {speak()}
     }).save(`tmp/${fileName}.mp3`)
@@ -76,11 +76,11 @@ async function saveAndSpeak(data,text) { //genAudio()からのデータをいっ
 async function speak() { //*.mp3を読み上げ
   if (dataName.length === 0) {return false}
   reading = true
-  log2(`reading D:\\Bot\\tmp\\${dataName[0]}.mp3`,"debug")
+  log2(`reading tmp\\${dataName[0]}.mp3`,"debug")
   const resource = createAudioResource(`tmp/${dataName[0]}.mp3`, { inputType: StreamType.Arbitrary,},);
   player.play(resource);
   await entersState(player, AudioPlayerStatus.Idle, 2 ** 31 - 1);
-  log2(`\x1b[2mreading D:\\Bot\\tmp\\${dataName[0]}.mp3\x1b[0m => finished`,"debug")
+  log2(`\x1b[2mreading tmp\\${dataName[0]}.mp3\x1b[0m => finished`,"debug")
   dataName.shift()
   if (dataName.length === 0) {reading = false} else {speak()}
 }
