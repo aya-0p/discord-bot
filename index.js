@@ -146,7 +146,8 @@ client.on('ready', () => { //初期処理
     require("./commands/disconnect.json"),
     require("./commands/addword.json"),
     require("./commands/ch_default_voice.json"),
-    require("./commands/ch_my_voice.json")
+    require("./commands/ch_my_voice.json"),
+    require("./commands/delword.json")
   ];
   const command = client.application?.commands.set(data,process.env.server);
   log2('BOT is ready', "info")
@@ -239,14 +240,17 @@ client.on("interactionCreate", async (interaction) => { //interaction(/)
     interaction.reply({content: `${delWord}の読み替えを削除しました。(存在しない場合は削除されていません)`,})
     settings.replaces.regex.forEach((e,i) => {
       if (e.before === delWord) {
-        settings.replaces.regex.splice(i,1)
+        log2(`deleted word, ${settings.replaces.regex[i].before} => ${settings.replaces.regex[i].after}`,"info");
+        settings.replaces.regex.splice(i,1);
       }
     })
     settings.replaces.text.forEach((e,i) => {
       if (e.before === delWord) {
+        log2(`deleted word, ${settings.replaces.text[i].before} => ${settings.replaces.text[i].after}`,"info");
         settings.replaces.text.splice(i,1)
       }
     })
+    try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
   }
   
   if ( interaction.commandName === 'addword' ) {
