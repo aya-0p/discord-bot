@@ -234,6 +234,21 @@ client.on("interactionCreate", async (interaction) => { //interaction(/)
     log2(`changed ${interaction.user.name}'s voice to id:${interaction.options.getString("id")}`,"info")
   }
   
+  if ( interaction.commandName === 'delword' ) {
+    const delWord = interaction.options.getString("word")
+    interaction.reply({content: `${delWord}の読み替えを削除しました。(存在しない場合は削除されていません)`,})
+    settings.replaces.regex.forEach((e,i) => {
+      if (e.before === delWord) {
+        settings.replaces.regex.splice(i,1)
+      }
+    })
+    settings.replaces.text.forEach((e,i) => {
+      if (e.before === delWord) {
+        settings.replaces.text.splice(i,1)
+      }
+    })
+  }
+  
   if ( interaction.commandName === 'addword' ) {
     const a = interaction.options.getString("before")
     const b = interaction.options.getString("after")
