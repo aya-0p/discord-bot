@@ -5,7 +5,7 @@
     {
       "type": "STRING",
       "name": "word",
-      "description": "削除する文字",
+      "description": "削除する読み替え",
       "required": true
     }
   ]
