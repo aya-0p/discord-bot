@@ -1,5 +1,9 @@
 # discord-bot
-botは1つのサーバーでのみ稼働させることを前提としています。  
+VOICEVOX利用の音声読み上げBot  
+(使い方は[how-to-use.md](https://github.com/aya-0p/discord-bot/blob/main/How-to-use.md)を確認)
+## 注意事項
+**Botは1つのサーバーだけで利用してください。**  
+確実に動作しません！
 
 ## 動作確認環境
 Microsoft Windows 10 version 21H1, OS build 19043.1348  
@@ -9,8 +13,8 @@ npm version 8.1.0
 その他各モジュールはpackage.jsonの通り  
 
 ## 構築方法
-botのtoken作成は済ませておく  
-VOICEVOXをインストールする  
+[botとtoken作成](https://discord.com/developers/)は済ませておく  
+[VOICEVOX](https://voicevox.hiroshiba.jp)をインストールする  
 以下を実行
 ```
 npm install
