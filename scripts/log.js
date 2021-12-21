@@ -17,6 +17,19 @@ exports.log2 = function log2(data, stt) { //log2(): ログを色付きで表示�
       break;
     case "error":
       status = `\u001b[31m${stt}`
+      break;
+    case "audio":
+      status = `\u001b[35m${stt}`
+      break;
+    case "message":
+      status = `\u001b[35m${stt}`
+      break;
+    case "interaction":
+      status = `\u001b[35m${stt}`
+      break;
+    case "attachments":
+      status = `\u001b[35m${stt}`
+      break;          
     default:
       break;
   }
