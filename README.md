@@ -4,14 +4,13 @@ botは1つのサーバーでのみ稼働させることを前提としていま�
 ## 動作確認環境
 Microsoft Windows 10 version 21H1, OS build 19043.1348  
 VOICEVOX version 0.9.3  
-ffmpeg version 4.2.3  
 node.js version 16.13.0  
 npm version 8.1.0  
 その他各モジュールはpackage.jsonの通り  
 
 ## 構築方法
 botのtoken作成は済ませておく  
-VOICEVOX,ffmpegをインストールする  
+VOICEVOXをインストールする  
 以下を実行
 ```
 npm install
