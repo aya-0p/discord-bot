@@ -20,8 +20,9 @@ rpc.get("/version").then(() => {}).catch(() => {console.log("Install and run VOI
 
 
 async function postMsgVoice(message) { //受け取ったメッセージを読み上げ用に変換して genAudio()
-  genWords(message)
-  readText.push(JSON.parse(`{"message":"${genWords(message)}", "uid": "${message.author.id}"}`))
+  genWords(message).forEach(e => {
+    readText.push(JSON.parse(`{"message":"${e}", "uid": "${message.author.id}"}`))
+  })
   if (!gening) {genAudio()}
 }
 
@@ -34,11 +35,10 @@ function genWords(message) { //メッセージを置き換え
   settings.replaces.text.forEach(t => {
     returnMessage1 = returnMessage1.replaceAll(t.before,t.after)
   })
-  returnMessage1 = returnMessage1.replaceAll("\n","")
   const reg = new RegExp("https?://[\\w!\\?/\\+\\-_~=;\\.,\\*&@#\\$%\\(\\)'\\[\\]]+", "g")
   returnMessage1 = returnMessage1.replaceAll(reg, "")
-  const returnMessage = returnMessage1
-  return(returnMessage)
+  const msg = returnMessage1.split("\n")
+  return(msg);
 }
 
 async function genAudio() { //readText内の文字を読み上げデータに変換しsaveAndSpeak()
