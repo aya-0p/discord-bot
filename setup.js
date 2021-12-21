@@ -5,4 +5,4 @@ fs.writeFileSync('replys.json','[]','utf8')
 fs.writeFileSync(".log",'\n','utf8')
 fs.mkdir('saves',{ recursive: true }, () => {});
 console.log("Open '.env' and write token, server id")
-console.log("Install ffmpeg and VOICEVOX")
+console.log("Install VOICEVOX")
