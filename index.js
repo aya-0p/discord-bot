@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const fs = require("fs-extra")
 require('date-utils')
 const ffmpeg = require('fluent-ffmpeg')
+ffmpeg.setFfmpegPath(require('ffmpeg-static'));
 require('ffmpeg-static')
 let settings = require("./settings.json")
 const { log2 } = require("./scripts/log.js")
