@@ -150,10 +150,8 @@ client.on('ready', () => { //初期処理
     options: [
       require("./commands/join.json"),
       require("./commands/disconnect.json"),
-      require("./commands/addword.json"),
       require("./commands/ch_default_voice.json"),
       require("./commands/ch_my_voice.json"),
-      require("./commands/delword.json"),
       require("./commands/read.json")
     ],
   }];
