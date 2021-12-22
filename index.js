@@ -12,6 +12,7 @@ const { log2 } = require("./scripts/log.js")
 const { changeVoice } = require("./scripts/change_voice.js")
 const { autoReply } = require("./scripts/autoreply.js")
 const { download } = require("./scripts/download.js")
+const { list } = require("./scripts/list.js")
 let connection,readCh,player,reading = false,dataName = [],vcConnecting = false,readText = [],gening = false
 dotenv.config();
 const rpc = axios.create({ baseURL: process.env.voicevox_url, proxy:false});
@@ -152,7 +153,8 @@ client.on('ready', () => { //初期処理
       require("./commands/addword.json"),
       require("./commands/ch_default_voice.json"),
       require("./commands/ch_my_voice.json"),
-      require("./commands/delword.json")
+      require("./commands/delword.json"),
+      require("./commands/read.json")
     ],
   }];
   const command = client.application?.commands.set(data,process.env.server);
@@ -238,37 +240,41 @@ client.on("interactionCreate", async (interaction) => { //interaction
       interaction.reply({content: `あなたの声を変更しました`,ephemeral: true,})
       log2(`changed ${interaction.user.name}'s voice to id:${interaction.options.getString("id")}`,logStatus.info)
     }
-  
-    if ( interaction.options.getSubcommand() === 'delword' ) {
-      const delWord = interaction.options.getString("word")
-      interaction.reply({content: `${delWord}の読み替えを削除しました。(存在しない場合は削除されていません)`,})
-      settings.replaces.regex.forEach((e,i) => {
-        if (e.before === delWord) {
-          log2(`deleted word, ${settings.replaces.regex[i].before} => ${settings.replaces.regex[i].after}`,logStatus.info);
-          settings.replaces.regex.splice(i,1);
-        }
-      })
-      settings.replaces.text.forEach((e,i) => {
-        if (e.before === delWord) {
-          log2(`deleted word, ${settings.replaces.text[i].before} => ${settings.replaces.text[i].after}`,logStatus.info);
-          settings.replaces.text.splice(i,1)
-        }
-      })
+if ( interaction.options.getSubcommand() === "read") {
+  const before  = interaction.options?.getString("before")
+  const after = interaction.options?.getString("after")
+  const regex = interaction.options?.getBoolean("regex")
+  if (before && after) {
+    if (after === ".") {after = ""}
+    interaction.reply({content: `文字を置き換えて読みます。\n${before} => ${after}`,})
+    log2(`replaces added(regex is ${interaction.options?.getBoolean("regex")}),\n${before} => ${after}`, logStatus.info)
+    if (regex) {
+      settings.replaces.regex.push(JSON.parse(`{"before": "${before}","after": "${after}"}`));
+      try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
+    } else {
+      settings.replaces.text.push(JSON.parse(`{"before": "${before}","after": "${after}"}`));
       try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
     }
-  
-    if ( interaction.options.getSubcommand() === 'addword' ) {
-      const a = interaction.options.getString("before")
-      const b = interaction.options.getString("after")
-      interaction.reply({content: `文字を置き換えて読みます。\n${a} => ${b}`,})
-      log2(`replaces added(regex is ${interaction.options?.getBoolean("regex")}),\n${a} => ${b}`, logStatus.info)
-      if (interaction.options?.getBoolean("regex")) {
-        settings.replaces.regex.push(JSON.parse(`{"before": "${a}","after": "${b}"}`));
-        try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
-      } else {
-        settings.replaces.text.push(JSON.parse(`{"before": "${a}","after": "${b}"}`));
-        try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
-}}}});
+  } else if (before) {
+    interaction.reply({content: `${before}の読み替えを削除しました。(存在しない場合は削除されていません)`,})
+    settings.replaces.regex.forEach((e,i) => {
+      if (e.before === before) {
+        log2(`deleted word, ${settings.replaces.regex[i].before} => ${settings.replaces.regex[i].after}`,logStatus.info);
+        settings.replaces.regex.splice(i,1);
+      }
+    })
+    settings.replaces.text.forEach((e,i) => {
+      if (e.before === before) {
+        log2(`deleted word, ${settings.replaces.text[i].before} => ${settings.replaces.text[i].after}`,logStatus.info);
+        settings.replaces.text.splice(i,1)
+      }
+    })
+    try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
+  } else {
+    interaction.reply({content: `読み替え一覧です。\n${list()}`,})
+  }
+}
+}});
 
 log2("------------------------------\n---------SCRIPT STARTED-------\n------------------------------",logStatus.info);
 client.login(process.env.token); //ログイン

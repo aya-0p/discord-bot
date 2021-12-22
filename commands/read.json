@@ -1,0 +1,20 @@
+{
+  "name": "read",
+  "description": "読み替え",
+  "type": "SUB_COMMAND",
+  "options": [
+    {
+      "type": "STRING",
+      "name": "before",
+      "description": "読み替え前の文字(入力しなければリスト表示)"
+    },{
+      "type": "STRING",
+      "name": "after",
+      "description": "読み替え後の文字(入力しなければ削除、'.'で読まない)"
+    },{
+      "type": "BOOLEAN",
+      "name": "regex",
+      "description": "正規表現を利用している"
+    }
+  ]
+}
