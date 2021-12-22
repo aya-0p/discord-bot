@@ -1,6 +1,6 @@
 const {default:axios} = require("axios");
 const fs = require("fs-extra")
-const { log2 } = require("./scripts/log.js")
+const { log2 } = require("./log.js")
 require('date-utils')
 exports.download = async function download(url,fileName, i, ext) {
   ext = ext ?? ""

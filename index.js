@@ -143,14 +143,18 @@ function disconnect() { //"/disconnect"の処理
 
 client.on('ready', () => { //初期処理
   log2(`logged in as ${client.user.tag}`, logStatus.info)
-  const data = [
-    require("./commands/join.json"),
-    require("./commands/disconnect.json"),
-    require("./commands/addword.json"),
-    require("./commands/ch_default_voice.json"),
-    require("./commands/ch_my_voice.json"),
-    require("./commands/delword.json")
-  ];
+  const data = [{
+    name: "ay",
+    description: "あやのbotコマンド",
+    options: [
+      require("./commands/join.json"),
+      require("./commands/disconnect.json"),
+      require("./commands/addword.json"),
+      require("./commands/ch_default_voice.json"),
+      require("./commands/ch_my_voice.json"),
+      require("./commands/delword.json")
+    ],
+  }];
   const command = client.application?.commands.set(data,process.env.server);
   log2('BOT is ready', logStatus.info)
 })
@@ -199,72 +203,72 @@ client.on('messageCreate', (message) => { //メッセージが作られたとき
       }).catch(msg2 => {})
 }}});
 
-client.on("interactionCreate", async (interaction) => { //interaction(/)
+client.on("interactionCreate", async (interaction) => { //interaction
   if ( !interaction.isCommand() ) { //コマンドじゃなければ無視
     return;
   }
-  log2(interaction.commandName, logStatus.interaction)
-  if ( interaction.commandName === 'join' ) { //join
-    join(interaction);
-    return;
-  }
+  if ( interaction.commandName === 'ay' ) {
+    log2(interaction.options.getSubcommand(), logStatus.interaction)
+    if ( interaction.options.getSubcommand() === 'join' ) { //join
+      join(interaction);
+      return;
+    }
+    if ( interaction.options.getSubcommand() === 'disconnect' ) { //disconnect
+      if ( disconnect() ) {
+        interaction.reply({
+          content: "切断しました。",
+          ephemeral: true,
+      })} else {
+        interaction.reply({
+          content: "接続されていません。\n接続されたままですか？一度'/join'を行ってから'/disconnect'を実行してください。",
+          ephemeral: true,
+      })}
+      vcConnecting = false
+      return;
+    }
 
-  if ( interaction.commandName === 'disconnect' ) { //disconnect
-    if ( disconnect() ) {
-      interaction.reply({
-        content: "切断しました。",
-        ephemeral: true,
-    })} else {
-      interaction.reply({
-        content: "接続されていません。\n接続されたままですか？一度'/join'を行ってから'/disconnect'を実行してください。",
-        ephemeral: true,
-    })}
-    vcConnecting = false
-    return;
-  }
+    if ( interaction.options.getSubcommand() === 'ch_default_voice' ) {
+      settings = changeVoice(interaction.options.getString("id"), settings)
+      interaction.reply({content: `デフォルトの声を変更しました`,})
+      log2(`changed default voice to id:${interaction.options.getString("id")}`,logStatus.info)
+    }
 
-  if ( interaction.commandName === 'ch_default_voice' ) {
-    settings = changeVoice(interaction.options.getString("id"), settings)
-    interaction.reply({content: `デフォルトの声を変更しました`,})
-    log2(`changed default voice to id:${interaction.options.getString("id")}`,logStatus.info)
-  }
-
-  if ( interaction.commandName === 'ch_my_voice' ) {
-    settings = changeVoice(interaction.options.getString("id"), settings, interaction.user.id)
-    interaction.reply({content: `あなたの声を変更しました`,ephemeral: true,})
-    log2(`changed ${interaction.user.name}'s voice to id:${interaction.options.getString("id")}`,logStatus.info)
-  }
+    if ( interaction.options.getSubcommand() === 'ch_my_voice' ) {
+      settings = changeVoice(interaction.options.getString("id"), settings, interaction.user.id)
+      interaction.reply({content: `あなたの声を変更しました`,ephemeral: true,})
+      log2(`changed ${interaction.user.name}'s voice to id:${interaction.options.getString("id")}`,logStatus.info)
+    }
   
-  if ( interaction.commandName === 'delword' ) {
-    const delWord = interaction.options.getString("word")
-    interaction.reply({content: `${delWord}の読み替えを削除しました。(存在しない場合は削除されていません)`,})
-    settings.replaces.regex.forEach((e,i) => {
-      if (e.before === delWord) {
-        log2(`deleted word, ${settings.replaces.regex[i].before} => ${settings.replaces.regex[i].after}`,logStatus.info);
-        settings.replaces.regex.splice(i,1);
-      }
-    })
-    settings.replaces.text.forEach((e,i) => {
-      if (e.before === delWord) {
-        log2(`deleted word, ${settings.replaces.text[i].before} => ${settings.replaces.text[i].after}`,logStatus.info);
-        settings.replaces.text.splice(i,1)
-      }
-    })
-    try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
-  }
+    if ( interaction.options.getSubcommand() === 'delword' ) {
+      const delWord = interaction.options.getString("word")
+      interaction.reply({content: `${delWord}の読み替えを削除しました。(存在しない場合は削除されていません)`,})
+      settings.replaces.regex.forEach((e,i) => {
+        if (e.before === delWord) {
+          log2(`deleted word, ${settings.replaces.regex[i].before} => ${settings.replaces.regex[i].after}`,logStatus.info);
+          settings.replaces.regex.splice(i,1);
+        }
+      })
+      settings.replaces.text.forEach((e,i) => {
+        if (e.before === delWord) {
+          log2(`deleted word, ${settings.replaces.text[i].before} => ${settings.replaces.text[i].after}`,logStatus.info);
+          settings.replaces.text.splice(i,1)
+        }
+      })
+      try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
+    }
   
-  if ( interaction.commandName === 'addword' ) {
-    const a = interaction.options.getString("before")
-    const b = interaction.options.getString("after")
-    interaction.reply({content: `文字を置き換えて読みます。\n${a} => ${b}`,})
-    log2(`replaces added(regex is ${interaction.options?.getBoolean("regex")}),\n${a} => ${b}`, logStatus.info)
-    if (interaction.options?.getBoolean("regex")) {
-      settings.replaces.regex.push(JSON.parse(`{"before": "${a}","after": "${b}"}`));
-      try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
-    } else {
-      settings.replaces.text.push(JSON.parse(`{"before": "${a}","after": "${b}"}`));
-      try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
-}}});
+    if ( interaction.options.getSubcommand() === 'addword' ) {
+      const a = interaction.options.getString("before")
+      const b = interaction.options.getString("after")
+      interaction.reply({content: `文字を置き換えて読みます。\n${a} => ${b}`,})
+      log2(`replaces added(regex is ${interaction.options?.getBoolean("regex")}),\n${a} => ${b}`, logStatus.info)
+      if (interaction.options?.getBoolean("regex")) {
+        settings.replaces.regex.push(JSON.parse(`{"before": "${a}","after": "${b}"}`));
+        try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
+      } else {
+        settings.replaces.text.push(JSON.parse(`{"before": "${a}","after": "${b}"}`));
+        try {fs.writeFileSync('settings.json', JSON.stringify(settings), 'utf8')} catch (err) {console.log(err)}
+}}}});
 
 log2("------------------------------\n---------SCRIPT STARTED-------\n------------------------------",logStatus.info);
 client.login(process.env.token); //ログイン

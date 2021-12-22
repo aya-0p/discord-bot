@@ -1,6 +1,7 @@
 {
   "name": "addword",
   "description": "読み上げで言い換える",
+  "type": "SUB_COMMAND",
   "options": [
     {
       "type": "STRING",

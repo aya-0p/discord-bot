@@ -1,6 +1,7 @@
 {
   "name": "ch_my_voice",
   "description": "自分の声を変更する",
+  "type": "SUB_COMMAND",
   "options": [
     {
       "type": "STRING",

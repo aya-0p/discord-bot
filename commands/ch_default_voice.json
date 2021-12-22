@@ -1,6 +1,7 @@
 {
   "name": "ch_default_voice",
   "description": "デフォルトの声を変更する",
+  "type": "SUB_COMMAND",
   "options": [
     {
       "type": "STRING",

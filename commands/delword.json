@@ -1,6 +1,7 @@
 {
   "name": "delword",
   "description": "読み替えを削除する",
+  "type": "SUB_COMMAND",
   "options": [
     {
       "type": "STRING",
