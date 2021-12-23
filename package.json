@@ -21,7 +21,7 @@
     "fs": "^0.0.1-security",
     "fs-extra": "^10.0.0",
     "libsodium-wrappers": "^0.7.9",
-    "request": "^2.88.2",
-    "tweetnacl": "^1.0.3"
+    "tweetnacl": "^1.0.3",
+    "unzipper": "^0.10.11"
   }
 }
