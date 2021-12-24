@@ -15,11 +15,7 @@ npm version 8.1.0
 ## 構築方法
 [botとtoken作成](https://discord.com/developers/)は済ませておく  
 [VOICEVOX](https://voicevox.hiroshiba.jp)をインストールする  
-以下を実行
-```
-npm install
-node setup.js
-```
+`setup.bat`を実行(自動ですべてインストールされます)  
 .envにそれぞれ記入  
 
 ## 実行方法
@@ -29,12 +25,8 @@ node index.js
 ```  
 
 ## アップデート方法
-commands,scripts,index.jsを差し替える(README.mdなど実行に関係ないものは更新する必要はない)  
-その後、一応以下を実行
-```
-npm install
-```
+`update.js`を実行
 
 ## ログについて
-.logにログがあります。ここにbotが入っており、見ることができるチャンネルのメッセージなども記録されます。  
-なお、すべてのメッセージログが不要な場合は.env内のdebugをfalseにしてください。（読み上げ、コマンド操作など一部は残ります）
+.logにログがあります。.env内のdebugをtrueにすることで見ることができるチャンネルのメッセージなども記録されます。  
+なお、false(初期)だと記録されません。（読み上げ、コマンド操作など一部は残ります）
