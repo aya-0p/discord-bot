@@ -5,7 +5,6 @@ call powershell -command "Expand-Archive -Force tmp\main.zip tmp"
 robocopy tmp\discord-bot-main\ %~dp0 /S /E
 rmdir /S /Q tmp
 mkdir saves
-mkdir jsons
 echo {"voice":{"default":1},"replaces":{"text":[],"regex":[]}} > jsons\settings.json
 echo # discord token > .env
 echo. >> .env
