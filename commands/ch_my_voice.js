@@ -1,0 +1,35 @@
+const { log2 } = require("../scripts/log.js")
+const { changeVoice } = require("../scripts/change_voice.js")
+const logStatus = require("../jsons/logStatus.json")
+module.exports = {
+  data: {
+  name: "ch_my_voice",
+    description: "自分の声を変更する",
+    type: "SUB_COMMAND",
+    options: [
+      {
+        type: "STRING",
+        name: "id",
+        description: "声の名前",
+        required: true,
+        choices: [
+          {value: "0", name: "四国めたん-あまあま"},
+          {value: "1", name: "ずんだもん-あまあま"},
+          {value: "2", name: "四国めたん-ノーマル"},
+          {value: "3", name: "ずんだもん-ノーマル"},
+          {value: "4", name: "四国めたん-セクシー"},
+          {value: "5", name: "ずんだもん-セクシー"},
+          {value: "6", name: "四国めたん-ツンツン"},
+          {value: "7", name: "ずんだもん-ツンツン"},
+          {value: "8", name: "春日部つむぎ"},
+          {value: "9", name: "波音リツ"}
+        ]
+      }
+    ]
+  },
+  async execute(interaction) {
+    changeVoice(interaction.options.getString("id"), interaction.user.id)
+    interaction.reply({content: `あなたの声を変更しました`,ephemeral: true,})
+    log2(`changed ${interaction.user.name}'s voice to id:${interaction.options.getString("id")}`,logStatus.info)
+  }
+}

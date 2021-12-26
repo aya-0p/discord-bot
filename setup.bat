@@ -1,12 +1,8 @@
 @echo off
-cd /d %~dp0
-mkdir tmp
-curl -o "tmp\main.zip" "https://codeload.github.com/aya-0p/discord-bot/zip/refs/heads/main"
-call powershell -command "Expand-Archive -Force tmp\main.zip tmp"
-robocopy tmp\discord-bot-main\ %~dp0 /S /E
-rmdir /S /Q tmp
+
 mkdir saves
-echo {"voice":{"default":1},"replaces":{"text":[],"regex":[]}} > settings.json
+mkdir jsons
+echo {"voice":{"default":1},"replaces":{"text":[],"regex":[]}} > jsons\settings.json
 echo # discord token > .env
 echo. >> .env
 echo token= >> .env
@@ -30,7 +26,7 @@ echo. >> .env
 echo # log everything >> .env
 echo. >> .env
 echo logall=false >> .env
-echo [] > replys.json
+echo [] > jsons\replys.json
 echo. > .log
 echo ### Open '.env' and write token, server id ###
 echo ### Install VOICEVOX ###

@@ -16,13 +16,12 @@ axios.get("https://github.com/aya-0p/discord-bot/archive/refs/heads/main.zip", {
     const b = unzipper.Extract({ path: 'tmp/update' })
     a.pipe(b)
     b.on("close",()=>{
-      console.log(0)
       try {fs.copy('tmp/update/discord-bot-main/scripts','scripts')} catch {console.log("tmp/update/discord-bot-main/scripts not exist")}
       try {fs.copy('tmp/update/discord-bot-main/commands','commands')} catch {console.log("tmp/update/discord-bot-main/commands does not exist")}
       try {fs.copyFile('tmp/update/discord-bot-main/index.js','index.js')} catch {console.log("tmp/update/discord-bot-main/index.js does not exist")}
       try {fs.copyFile('tmp/update/discord-bot-main/package.json','package.json')} catch {console.log("tmp/update/discord-bot-main/package.json does not exist")}
       try {fs.copyFile('tmp/update/discord-bot-main/package-lock.json','package-lock.json')} catch {console.log("tmp/update/discord-bot-main/package-lock.json does not exist")}
-      exec('npm install',(a,b,c)=>{console.log(`${a}\n${b}\n${c}`)})
+      exec('npm install',(a,b,c)=>{console.log(`${b}`)})
     })
   } catch {console.log("could not unzip")}
 })
