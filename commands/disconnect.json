@@ -1,5 +1,0 @@
-{
-  "name": "disconnect",
-  "description": "ボイスチャンネルから退出",
-  "type": "SUB_COMMAND"
-}
