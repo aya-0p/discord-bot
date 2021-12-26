@@ -10,27 +10,21 @@ botの使い方です。
 ボイスチャンネルで読み上げ  
 メッセージURLからメッセージを表示  
 自動返信
-## /join
+## /ay join
 実行者が参加しているボイスチャンネルに参加
-## /disconnect
+## /ay disconnect
 ボイスチャンネルから退出
-## /addword [before] [after] [regex]
-ボイスチャンネルで読み上げる際のメッセージの読み替え
+## /ay read [before] [after] [regex]
 ### before
-読み替える前の語
+読み替える前の語(入力しないと読み替えリストを表示)
 ### after
-読み替えた後の語
+読み替えた後の語(入力しないと読み替え削除、"."で読まない)
 ### regex
-省略可  
 正規表現を利用する
-## /ch_default_voice [id], /ch_my_voice [id]
+## /ay ch_default_voice [id], /ch_my_voice [id]
 デフォルトの、実行者の読み上げ音声を変更
 ### id
 読み上げ者名(VOICEVOXに存在するもののみ選択可)
-## /delword [word]
-/addwordで追加した読み替えを削除する
-### word
-削除する読み替え前の文字列
 ## 自動返信
 現在は設定なし
 ## メッセージURLからメッセージを表示
