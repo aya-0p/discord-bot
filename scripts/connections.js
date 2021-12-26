@@ -23,6 +23,7 @@ function generateReadMessage(message) {
   })
   const reg = new RegExp("https?://[\\w!\\?/\\+\\-_~=;\\.,\\*&@#\\$%\\(\\)'\\[\\]]+", "g")
   returnMessage1 = returnMessage1.replaceAll(reg, "")
+  returnMessage1 = returnMessage1.replaceAll("\\", "")
   const msg = returnMessage1.split("\n")
   return(msg);
 }
