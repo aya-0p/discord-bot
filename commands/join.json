@@ -1,5 +1,0 @@
-{
-  "name": "join",
-  "description": "ボイスチャンネルに参加",
-  "type": "SUB_COMMAND"
-}
