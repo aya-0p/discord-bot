@@ -36,7 +36,7 @@ function deleteReplaces(before, interaction) {
   try {fs.writeFileSync('jsons/settings.json', JSON.stringify(settings), 'utf8')} catch (err) {log2("settings did not save\n"+err, logStatus.error)}
 }
 function showReplaces(interaction) {
-  interaction.reply({content: `読み替え一覧です。\n${list()}`,})
+  interaction.reply({ content: `読み替え一覧です。\n${list()}`, ephemeral: true,})
 }
 module.exports = {
   data: {
