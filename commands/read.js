@@ -19,20 +19,28 @@ function addReplaceAsText(before, after, interaction) {
   try {fs.writeFileSync('jsons/settings.json', JSON.stringify(settings), 'utf8')} catch (err) {log2("settings did not save\n"+err, logStatus.error)}
 }
 function deleteReplaces(before, interaction) {
-  interaction.reply({content: `${before}の読み替えを削除しました。(存在しない場合は削除されていません)`,})
+  interaction.reply({content: "削除中...",})
   let settings = require("../jsons/settings.json")
+  let deleteCount = 0
   settings.replaces.regex.forEach((e,i) => {
     if (e.before === before) {
-      log2(`deleted word, ${settings.replaces.regex[i].before} => ${settings.replaces.regex[i].after}`,logStatus.info);
-      settings.replaces.regex.splice(i,1);
+      log2(`deleted word, ${settings.replaces.regex[i].before} => ${settings.replaces.regex[i].after}`, logStatus.info);
+      interaction.followUp({ content: `削除しました。\n>> ${settings.replaces.regex[i].before} => ${settings.replaces.regex[i].after}`, })
+      settings.replaces.regex.splice(i, 1);
+      deleteCount++
     }
   })
   settings.replaces.text.forEach((e,i) => {
     if (e.before === before) {
-      log2(`deleted word, ${settings.replaces.text[i].before} => ${settings.replaces.text[i].after}`,logStatus.info);
-      settings.replaces.text.splice(i,1)
+      log2(`deleted word, ${settings.replaces.text[i].before} => ${settings.replaces.text[i].after}`, logStatus.info);
+      interaction.followUp({ content: `削除しました。\n>> ${settings.replaces.text[i].before} => ${settings.replaces.text[i].after}`, })
+      settings.replaces.text.splice(i, 1)
+      deleteCount++
     }
   })
+  if (deleteCount === 0) {
+    interaction.editReply({ content: "削除するものが見つかりませんでした。", })
+  }
   try {fs.writeFileSync('jsons/settings.json', JSON.stringify(settings), 'utf8')} catch (err) {log2("settings did not save\n"+err, logStatus.error)}
 }
 function showReplaces(interaction) {
