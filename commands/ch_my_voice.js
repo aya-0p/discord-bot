@@ -30,6 +30,6 @@ module.exports = {
   async execute(interaction) {
     changeVoice(interaction.options.getNumber("id"), interaction.user.id)
     interaction.reply({content: `あなたの声を変更しました`,ephemeral: true,})
-    log2(`changed ${interaction.user.name}'s voice to id:${interaction.options.getNumber("id")}`,logStatus.info)
+    log2(`changed ${interaction.user.username}'s voice to id:${interaction.options.getNumber("id")}`,logStatus.info)
   }
 }

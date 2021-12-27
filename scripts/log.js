@@ -34,7 +34,7 @@ exports.log2 = function log2(data, stt) { //log2(): ログを色付きで表示�
       break;
   }
   let b = data.split("\n")
-  let d = new Date().toFormat("HH24:MI:SS")
+  let d = new Date().toFormat("YYYY-MM-DD HH24:MI:SS")
   let bdy
   for (let i = 0; i < b.length; i++) {
     if (i == 0) {bdy = `(${(i+1).toString().padStart(2,"0")}/${b.length.toString().padStart(2,"0")}) ${b[i]}`} 

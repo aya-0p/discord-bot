@@ -13,19 +13,23 @@ const rpc = axios.create({ baseURL: process.env.voicevox_url, proxy:false});
 let connecting = false,connection,readingChannel = 0,audioPlayer,readText = [],audioGenerateing = false,dataName = [],reading = false
 
 function generateReadMessage(message) {
-  let returnMessage1 = `${message.member.displayName}さん、${message}`
-  require("../jsons/settings.json").replaces.regex.forEach(r => {
-    const rep = new RegExp(r.before, "g")
-    returnMessage1 = returnMessage1.replaceAll(rep,r.after)
-  })
-  require("../jsons/settings.json").replaces.text.forEach(t => {
-    returnMessage1 = returnMessage1.replaceAll(t.before,t.after)
-  })
-  const reg = new RegExp("https?://[\\w!\\?/\\+\\-_~=;\\.,\\*&@#\\$%\\(\\)'\\[\\]]+", "g")
-  returnMessage1 = returnMessage1.replaceAll(reg, "")
-  returnMessage1 = returnMessage1.replaceAll("\\", "")
-  const msg = returnMessage1.split("\n")
-  return(msg);
+  try {
+    let returnMessage1 = `${message.member.displayName}さん、${message}`
+    require("../jsons/settings.json").replaces.regex.forEach(r => {
+      const rep = new RegExp(r.before, "g")
+      returnMessage1 = returnMessage1.replaceAll(rep, r.after)
+    })
+    require("../jsons/settings.json").replaces.text.forEach(t => {
+      returnMessage1 = returnMessage1.replaceAll(t.before, t.after)
+    })
+    const reg = new RegExp("https?://[\\w!\\?/\\+\\-_~=;\\.,\\*&@#\\$%\\(\\)'\\[\\]]+", "g")
+    returnMessage1 = returnMessage1.replaceAll(reg, "")
+    returnMessage1 = returnMessage1.replaceAll("\\", "")
+    const msg = returnMessage1.split("\n")
+    return (msg);
+  } catch {
+    e => { log2(e, logStatus.error); return ([]) }
+  }
 }
 
 async function generateAudio() {
