@@ -1,3 +1,7 @@
+/**
+ * 読み上げ変換リスト作成する関数
+ * @returns {String} 読み上げ変換リスト
+ */
 exports.list = function list() {
   const settings = require("../jsons/settings.json")
   let replaces = []

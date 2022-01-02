@@ -1,7 +1,12 @@
-const { log2 } = require("../scripts/log.js")
+const log = require("../scripts/log.js")
 const { changeVoice } = require("../scripts/change_voice.js")
-const logStatus = require("../jsons/logStatus.json")
+/**
+ * /ay ch_my_voice
+ */
 module.exports = {
+  /**
+   * @type {ApplicationCommandData} https://discord.js.org/#/docs/main/stable/typedef/ApplicationCommandData
+   */
   data: {
   name: "ch_my_voice",
     description: "自分の声を変更する",
@@ -27,9 +32,13 @@ module.exports = {
       }
     ]
   },
+  /**
+   * コマンド実行時に実行される関数
+   * @param {discordjs_Interaction} interaction https://discord.js.org/#/docs/main/stable/class/Interaction
+   */
   async execute(interaction) {
     changeVoice(interaction.options.getNumber("id"), interaction.user.id)
     interaction.reply({content: `あなたの声を変更しました`,ephemeral: true,})
-    log2(`changed ${interaction.user.username}'s voice to id:${interaction.options.getNumber("id")}`,logStatus.info)
+    log.log(`changed ${interaction.user.username}'s voice to id:${interaction.options.getNumber("id")}`,log.info)
   }
 }
