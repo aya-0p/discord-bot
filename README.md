@@ -15,7 +15,7 @@ npm version 8.1.0
 ## 構築方法
 ファイルをダウンロード  
 [最新版(動作しない可能性あり)](https://github.com/aya-0p/discord-bot/releases/tag/latest)  
-[v1.0.0](https://github.com/aya-0p/discord-bot/releases/tag/v1.0.0)  
+[v1.0.2](https://github.com/aya-0p/discord-bot/releases/tag/v1.0.2)  
 [botとtoken作成](https://discord.com/developers/)は済ませておく  
 [VOICEVOX](https://voicevox.hiroshiba.jp)をインストールする  
 `setup.bat`を実行(自動ですべてインストールされます)  
@@ -28,7 +28,7 @@ node index.js
 ```  
 
 ## アップデート方法
-`update.js`を実行
+`update.bat`を実行
 
 ## ログについて
 .logにログがあります。.env内のdebugをtrueにすることで見ることができるチャンネルのメッセージなども記録されます。  
