@@ -13,7 +13,6 @@ module.exports = {
    * @param {String} status ログのステータス(debug,info,warning,error,audio,message,interaction,attachments)
    */
   log(data, status) {
-    let status
     switch (status) {
       case "debug":
         status = `\u001b[36m${status}`

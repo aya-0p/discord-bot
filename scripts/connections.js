@@ -56,15 +56,11 @@ let connecting = false,
   /**
    * @type {Array<String>} 再生する音楽一覧
    */
-  musicPlayList = [],
-  /**
-   * @type {Array<String>} 再生する音楽一覧(元)
-   */
-  musics = []
-const musicFiles = fs.readdirSync('../musics').filter(file => file.endsWith('.mp3'))
-for (const file of musicFiles) {
-  musics.push(file)
-}
+  musicPlayList = []
+/**
+ * @type {Array<String>} 再生する音楽一覧(元)
+ */
+const musicFiles = fs.readdirSync('musics').filter(file => file.endsWith('.mp3'))
 /**
  * discordから送られるメッセージを読み上げ用の文字列に変換する関数
  * @param {Message} message discordjsのMessage Class
@@ -154,10 +150,11 @@ async function voiceChannelConnect(interaction) {
   const memberVC = member.voice.channel;
   if (!memberVC || !memberVC.joinable || !memberVC.speakable) {
     log.log("Could not join to VoiceChannel", log.warning)
-    return interaction.reply({
+    interaction.reply({
       content: `${!memberVC ? (interaction.member.displayName + "がボイスチャンネルに入っていないため") : "権限がないため"}ボイスチャンネルに接続できません。`,
       ephemeral: true,
     });
+    return false
   }
   connection = joinVoiceChannel({
     guildId: guild.id,
@@ -172,6 +169,7 @@ async function voiceChannelConnect(interaction) {
   connection.subscribe(audioPlayer);
   connecting = true
   log.log(`connected to voice channel, ${member.voice.channel.name}`, log.info)
+  return true
 }
 /**
  * 音楽を再生する関数
@@ -179,25 +177,27 @@ async function voiceChannelConnect(interaction) {
  */
 async function musicPlay(interaction) {
   const musicPlayName = getMusicId()
-  const resource = createAudioResource(`musics/${musicPlayName}.mp3`, { inputType: StreamType.Arbitrary, },);
-  log.log(`playing ${musicPlayName}.mp3`, log.audio)
+  const resource = createAudioResource(`musics/${musicPlayName}`, { inputType: StreamType.Arbitrary, },);
+  log.log(`playing ${musicPlayName}`, log.audio)
   audioPlayer.play(resource);
-  interaction.client.channels.cache.get(readingChannel).send(`${musiclist[id]}を再生中...`).then(async (sMsg) => {
+  interaction.client.channels.cache.get(readingChannel).send(`${musicPlayName}を再生中...`).then(async (sMsg) => {
     await entersState(audioPlayer, AudioPlayerStatus.Idle, 2 ** 31 - 1);
-    log.log(`\x1b[2mplaying ${musicPlayName}.mp3\x1b[0m => finished`, log.audio)
+    log.log(`\x1b[2mplaying ${musicPlayName}\x1b[0m => finished`, log.audio)
     sMsg.delete()
     if (musicPlayContinue && connecting) { musicPlay(interaction) } else { musicPlaying = false; interaction.client.channels.cache.get(readingChannel).send(`再生終了`) }
   })
 }
 /**
  * ランダムに音楽を選曲する関数
- * @returns {String}
+ * @returns {String} 曲名
  */
 function getMusicId() {
-  if (musicPlayList.length === 0) musicPlayList = musics
-  const musicId = Math.floor(Math.random() * musics.length)
+  if (musicPlayList.length === 0) { musicPlayList = fs.readdirSync('musics').filter(file => file.endsWith('.mp3')) }
+  log.log(musicPlayList.length.toString(),log.info)
+  const musicId = Math.floor(Math.random() * musicPlayList.length)
+  const r = musicPlayList[musicId]
   musicPlayList.splice(musicId, 1)
-  return (musicPlayList[musicId])
+  return (r)
 }
 /**
  * 無音を再生(音楽のスキップ)する関数
@@ -269,7 +269,7 @@ module.exports = {
         return false
       }
     } else {
-      await voiceChannelConnect(interaction)
+      if(!await voiceChannelConnect(interaction)) return false
     }
     musicPlaying = true
     musicPlayContinue = true
