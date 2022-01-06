@@ -69,6 +69,9 @@ function deleteReplaces(before, interaction) {
 function showReplaces(interaction) {
   interaction.reply({ content: `読み替え一覧です。\n${list()}`, ephemeral: true,})
 }
+/**
+ * /ay read
+ */
 module.exports = {
   /**
    * @type {ApplicationCommandData} https://discord.js.org/#/docs/main/stable/typedef/ApplicationCommandData

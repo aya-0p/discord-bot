@@ -1,4 +1,7 @@
 const connections = require("../scripts/connections")
+/**
+ * /ay join
+ */
 module.exports = {
   /**
    * @type {ApplicationCommandData} https://discord.js.org/#/docs/main/stable/typedef/ApplicationCommandData
