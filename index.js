@@ -39,6 +39,7 @@ const commands = {}
  */
 function testFiles() {
   fs.remove('tmp', () => { fs.mkdir('tmp', { recursive: true }, () => { }); }); //tmp(一時フォルダ)作成
+  fs.mkdir('musics', { recursive: true }, () => { });
   /**
    * VOICEVOXのバージョンを取得し、サーバーがなければスクリプトを終了する
    */
