@@ -12,7 +12,7 @@ npm version 8.1.0
 ## 構築方法
 ファイルをダウンロード  
 [最新版(動作しない可能性あり)](https://github.com/aya-0p/discord-bot/releases/tag/latest)  
-[v1.0.0](https://github.com/aya-0p/discord-bot/releases/tag/v1.0.0)  
+[v1.0.3](https://github.com/aya-0p/discord-bot/releases/tag/v1.0.3)  
 [botとtoken作成](https://discord.com/developers/)は済ませておく  
 [VOICEVOX](https://voicevox.hiroshiba.jp)をインストールする  
 `setup.bat`を実行(自動ですべてインストールされます)  
