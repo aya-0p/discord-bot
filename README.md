@@ -1,9 +1,6 @@
 # discord-bot
 VOICEVOX利用の音声読み上げBot  
 (使い方は[how-to-use.md](https://github.com/aya-0p/discord-bot/blob/main/How-to-use.md)を確認)
-## 注意事項
-**Botは1つのサーバーだけで利用してください。**  
-確実に動作しません！
 
 ## 動作確認環境
 Microsoft Windows 10 version 21H1, OS build 19043.1348  
