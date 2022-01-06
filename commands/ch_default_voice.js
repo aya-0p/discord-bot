@@ -39,6 +39,6 @@ module.exports = {
   async execute(interaction) {
     changeVoice(interaction.options.getNumber("id"))
     interaction.reply({content: `デフォルトの声を変更しました`,})
-    log(`changed default voice to id:${interaction.options.getNumber("id")}`,log.info)
+    log.log(`changed default voice to id:${interaction.options.getNumber("id")}`,log.info)
   }
 }

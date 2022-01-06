@@ -11,52 +11,28 @@ require('ffmpeg-static')
 require('date-utils')
 const fs = require("fs-extra")
 const dotenv = require("dotenv");
+const { interaction } = require("./log");
 dotenv.config();
 const rpc = axios.create({ baseURL: process.env.voicevox_url, proxy: false });
 /**
- * @type {Boolean} Botがボイスチャンネルに接続中かどうか
+ * @type {Object} connection変数集合
  */
-let connecting = false,
-  /**
-   * @type {joinVoiceChannel} Botのボイスチャンネルへの接続
-   */
-  connection,
-  /**
-   * @type {Number} 読み上げ中のテキストチャンネル
-   */
-  readingChannel = 0,
-  /**
-   * @type {createAudioPlayer} Botのボイスチャンネルへの音声
-   */
-  audioPlayer,
+const read = {
   /**
    * @type {Array<String>} 読み上げ音声生成待ちの文字列
    */
-  readText = [],
+  readText: [],
   /**
    * @type {Boolean} 読み上げ音声を生成しているか
    */
-  audioGenerateing = false,
-  /**
-   * @type {Array<String>} 読み上げ待ちの音声データへのパスの文字列
-   */
-  dataName = [],
-  /**
-   * @type {Boolean} ボイスチャンネルで音声を生成中かどうか
-   */
-  reading = false,
-  /**
-   * @type {Boolean} 音楽を再生中かどうか
-   */
-  musicPlaying = false,
-  /**
-   * @type {Boolean} 音楽の再生を続けるかどうか
-   */
-  musicPlayContinue = false,
-  /**
-   * @type {Array<String>} 再生する音楽一覧
-   */
-  musicPlayList = []
+  audioGenerateing: false
+}
+
+
+
+
+
+
 /**
  * @type {Array<String>} 再生する音楽一覧(元)
  */
@@ -89,11 +65,11 @@ function generateReadMessage(message) {
  * 読み上げ用音声を生成する関数
  */
 async function generateAudio() {
-  audioGenerateing = true
-  const text = readText[0]
-  if (text?.message && text?.authorId) {
-    const voiceId = require("../jsons/settings.json").voice[text.authorId] ?? require("../jsons/settings.json").voice.default
-    const audio_query = await rpc.post('audio_query?text=' + encodeURI(text.message) + "&speaker=" + voiceId);
+  read.audioGenerateing = true
+  const text = read.readText[0]
+  if (text?.content && text?.author.id) {
+    const voiceId = require("../jsons/settings.json").voice[text.author.id] ?? require("../jsons/settings.json").voice.default
+    const audio_query = await rpc.post('audio_query?text=' + encodeURI(text.content) + "&speaker=" + voiceId);
     const synthsis = await rpc.post("synthesis?speaker=" + voiceId, JSON.stringify(audio_query.data), {
       responseType: 'arraybuffer',
       headers: {
@@ -101,18 +77,18 @@ async function generateAudio() {
         "Content-Type": "application/json"
       }
     });
-    log.log(`generated audio,\n${text.message}`,log.audio)
-    saveAndSpeak(synthsis.data,text.message)
+    log.log(`generated audio,\n${text.content}`,log.audio)
+    saveAndSpeak(synthsis.data, text.content, text.guildId)
   }
-  readText.shift()
-  if (readText.length === 0) {audioGenerateing = false} else {generateAudio()}
+  read.readText.shift()
+  if (read.readText.length === 0) { read.audioGenerateing = false} else {generateAudio()}
 }
 /**
  * 音声データ(data)をtmp\*.wavとして保存し、*.mp3に変換する関数
  * @param {Buffer} data 音声データ
  * @param {String} text メッセージ
  */
-async function saveAndSpeak(data,text) {
+async function saveAndSpeak(data,text,serverid) {
   const fileName = (new Date()).toFormat("YYYY-MM-DD_HH24-MI-SS");
   log.log(`\x1b[2mgenerated audio, ${text.substring(0, 10)}...\x1b[0m => tmp\\${fileName}.wav`,log.audio)
   fs.writeFileSync(`tmp/${fileName}.wav`, new Buffer.from(data), 'binary')
@@ -120,24 +96,24 @@ async function saveAndSpeak(data,text) {
     .toFormat("mp3")
     .on('end', async () => {
       log.log(`\x1b[2mgenerated audio, ${text.substring(0, 10)}... => tmp\\${fileName}.wav\x1b[0m => tmp\\${fileName}.mp3`,log.audio)
-      dataName.push(fileName)
-      if (!reading) {speak()}
+      read[serverid].dataName.push(fileName)
+      if (!read[serverid].reading) { speak(serverid)}
     }).save(`tmp/${fileName}.mp3`)
 }
 /**
  * *.mp3を読み上げる関数
  * @returns {undefined} 無し
  */
-async function speak() {
-  if (dataName.length === 0) {return}
-  reading = true
-  log.log(`reading tmp\\${dataName[0]}.mp3`,log.audio)
-  const resource = createAudioResource(`tmp/${dataName[0]}.mp3`, { inputType: StreamType.Arbitrary,},);
-  audioPlayer.play(resource);
-  await entersState(audioPlayer, AudioPlayerStatus.Idle, 2 ** 31 - 1);
-  log.log(`\x1b[2mreading tmp\\${dataName[0]}.mp3\x1b[0m => finished`,log.audio)
-  dataName.shift()
-  if (dataName.length === 0) {reading = false} else {speak()}
+async function speak(serverid) {
+  if (read[serverid].dataName.length === 0) {return}
+  read[serverid].reading = true
+  log.log(`reading tmp\\${read[serverid].dataName[0]}.mp3`,log.audio)
+  const resource = createAudioResource(`tmp/${read[serverid].dataName[0]}.mp3`, { inputType: StreamType.Arbitrary,},);
+  read[serverid].audioPlayer.play(resource);
+  await entersState(read[serverid].audioPlayer, AudioPlayerStatus.Idle, 2 ** 31 - 1);
+  log.log(`\x1b[2mreading tmp\\${read[serverid].dataName[0]}.mp3\x1b[0m => finished`,log.audio)
+  read[serverid].dataName.shift()
+  if (read[serverid].dataName.length === 0) { read[serverid].reading = false } else { speak(serverid)}
 }
 /**
  * ボイスチャンネルに接続する関数
@@ -156,18 +132,26 @@ async function voiceChannelConnect(interaction) {
     });
     return false
   }
-  connection = joinVoiceChannel({
-    guildId: guild.id,
-    channelId: memberVC.id,
-    adapterCreator: guild.voiceAdapterCreator,
-    selfMute: false,
-    selfDeaf: false
-  });
-  readingChannel = interaction.channelId;
+  read[interaction.guildId] = {
+    connecting: true,
+    musicPlayList: [],
+    connection: joinVoiceChannel({
+      guildId: guild.id,
+      channelId: memberVC.id,
+      adapterCreator: guild.voiceAdapterCreator,
+      selfMute: false,
+      selfDeaf: false
+    }),
+    readingChannel: interaction.channelId,
+    audioPlayer: createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause, }, }),
+    dataName: [],
+    reading: false,
+    musicPlaying: false,
+    musicPlayContinue: false,
+    musicPlayList: []
+  }
   interaction.reply({ content: "接続しました。", ephemeral: true, });
-  audioPlayer = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause, }, });
-  connection.subscribe(audioPlayer);
-  connecting = true
+  read[interaction.guildId].connection.subscribe(read[interaction.guildId].audioPlayer);
   log.log(`connected to voice channel, ${member.voice.channel.name}`, log.info)
   return true
 }
@@ -176,53 +160,52 @@ async function voiceChannelConnect(interaction) {
  * @param {Interaction} interaction discordjsのInteraction Class
  */
 async function musicPlay(interaction) {
-  const musicPlayName = getMusicId()
+  const musicPlayName = getMusicId(interaction)
+  if (!musicPlayName) {
+    interaction.followUp({ content: `再生する音楽がありません`, ephemeral: true, })
+    return
+  }
   const resource = createAudioResource(`musics/${musicPlayName}`, { inputType: StreamType.Arbitrary, },);
   log.log(`playing ${musicPlayName}`, log.audio)
-  audioPlayer.play(resource);
-  interaction.client.channels.cache.get(readingChannel).send(`${musicPlayName}を再生中...`).then(async (sMsg) => {
-    await entersState(audioPlayer, AudioPlayerStatus.Idle, 2 ** 31 - 1);
+  read[interaction.guildId].audioPlayer.play(resource);
+  interaction.client.channels.cache.get(read[interaction.guildId].readingChannel).send(`${musicPlayName}を再生中...`).then(async (sMsg) => {
+    await entersState(read[interaction.guildId].audioPlayer, AudioPlayerStatus.Idle, 2 ** 31 - 1);
     log.log(`\x1b[2mplaying ${musicPlayName}\x1b[0m => finished`, log.audio)
     sMsg.delete()
-    if (musicPlayContinue && connecting) { musicPlay(interaction) } else { musicPlaying = false; interaction.client.channels.cache.get(readingChannel).send(`再生終了`) }
+    if (read[interaction.guildId].musicPlayContinue && read[interaction.guildId].connecting) { musicPlay(interaction) } else { read[interaction.guildId].musicPlaying = false; interaction.client.channels.cache.get(read[interaction.guildId].readingChannel).send(`再生終了`) }
   })
 }
 /**
  * ランダムに音楽を選曲する関数
  * @returns {String} 曲名
  */
-function getMusicId() {
-  if (musicPlayList.length === 0) { musicPlayList = fs.readdirSync('musics').filter(file => file.endsWith('.mp3')) }
-  log.log(musicPlayList.length.toString(),log.info)
-  const musicId = Math.floor(Math.random() * musicPlayList.length)
-  const r = musicPlayList[musicId]
-  musicPlayList.splice(musicId, 1)
+function getMusicId(interaction) {
+  if (read[interaction.guildId].musicPlayList.length === 0) { read[interaction.guildId].musicPlayList = fs.readdirSync('musics').filter(file => file.endsWith('.mp3')) }
+  const musicId = Math.floor(Math.random() * read[interaction.guildId].musicPlayList.length)
+  const r = read[interaction.guildId].musicPlayList[musicId]
+  read[interaction.guildId].musicPlayList.splice(musicId, 1)
   return (r)
 }
 /**
  * 無音を再生(音楽のスキップ)する関数
  */
-async function soundSkip() {
+async function soundSkip(interaction) {
   const resource = createAudioResource(`resources/null.mp3`, { inputType: StreamType.Arbitrary, },);
-  audioPlayer.play(resource);
+  read[interaction.guildId].audioPlayer.play(resource);
 }
 /**
  * ボイスチャンネル用モジュール
  */
 module.exports = {
   /**
-   * @type {Boolean} ボイスチャンネルへの接続状況
-   */
-  connecting: connecting,
-  /**
    * ボイスチャンネルから退出する関数
    * @param {Interaction} interaction discordjsのInteraction Class
    */
   async disconnect(interaction) {
-    if (connecting) {
-      connection?.destroy()
+    if (read[interaction.guildId].connecting) {
+      read[interaction.guildId].connection?.destroy()
       interaction.reply({content: "切断しました。", ephemeral: true,})
-      connecting = false
+      read[interaction.guildId].connecting = false
       log.log("disconnected from the voice channel", log.info)
     } else {
       log.log("could not disconnect from voice channel", log.warning)
@@ -243,19 +226,18 @@ module.exports = {
    * @returns {undefined} 無し
    */
   async readMessage(message) {
-    if (readingChannel !== message.channelId || !connecting) return
+    if (read[message.guildId]?.readingChannel !== message.channelId || !read[message.guildId]?.connecting) return
     generateReadMessage(message).forEach(e => {
-      readText.push(JSON.parse(`{"message":"${e}", "authorId": "${message.author.id}"}`))
+      read.readText.push(message)
     })
-    if (!audioGenerateing) {generateAudio()}
+    if (!read.audioGenerateing) {generateAudio()}
   },
   /**
    * デバッグ用関数
    * @returns {String} 変数文字列
    */
   async debug() {
-    const debugs = `connections\n\nconnecting(bool) = ${connecting}\nreadingChannel(ChannelId) = ${readingChannel}\nreadText(text array) = ${readText.join(", ")}\naudioGenerateing(bool) = ${audioGenerateing}\ndataName(text array) = ${dataName.join(", ")}\nreading(bool) = ${reading}`
-    return(debugs)
+    return (read)
   },
   /**
    * 音楽を再生する関数
@@ -263,16 +245,16 @@ module.exports = {
    * @returns {undefined} 無し
    */
   async play(interaction) {
-    if (connecting) {
-      if (musicPlaying) {
+    if (read[interaction.guildId]?.connecting) {
+      if (read[interaction.guildId].musicPlaying) {
         interaction.reply({ content: `すでに再生しています`, ephemeral: true, });
         return false
       }
     } else {
       if(!await voiceChannelConnect(interaction)) return false
     }
-    musicPlaying = true
-    musicPlayContinue = true
+    read[interaction.guildId].musicPlaying = true
+    read[interaction.guildId].musicPlayContinue = true
     interaction.followUp({ content: `音楽を再生します...`, })
     musicPlay(interaction)
   },
@@ -281,7 +263,7 @@ module.exports = {
    * @param {Interaction} interaction discordjsのInteraction Class
    */
   async skip(interaction) {
-    if (connecting && musicPlaying) {
+    if (read[interaction.guildId].connecting && read[interaction.guildId].musicPlaying) {
       interaction.reply({ content: `スキップします。`, ephemeral: true, })
       soundSkip()
     } else {
@@ -294,12 +276,12 @@ module.exports = {
    * @returns {undefined} 無し
    */
   async stop(interaction) {
-    if (connecting) {
-      if (!musicPlayContinue) {
+    if (read[interaction.guildId].connecting) {
+      if (!read[interaction.guildId].musicPlayContinue) {
         interaction.reply({ content: `すでに終了しています`, ephemeral: true, });
         return false
       }
-      musicPlayContinue = false
+      read[interaction.guildId].musicPlayContinue = false
       interaction.reply({ content: `再生中のもので終了します。`, ephemeral: true, })
     } else {
       interaction.reply({ content: `ボイスチャンネルに接続されていません。`, ephemeral: true, })

@@ -53,10 +53,11 @@ function testFiles() {
   /**
    * .envの存在確認
    */
+  /*
   try { require("./.env") } catch {
     log.log(".envが存在しません\nsetup.batを実行してください", log.error);
     process.exit(1)
-  }
+  }*/
   /**
    * replys.jsonの存在確認
    */
@@ -84,11 +85,11 @@ function setUpCommands() {
   for (const commandName in commands) {
     data[0].options.push(commands[commandName].data) //data[0].options にコマンドを追加
   }
-  client.application?.commands.set(data, process.env.server); //コマンドをセット
+  client.application?.commands.set(data); //コマンドをセット
 }
 
 client.on('ready', () => { //初期処理
-  log.log("Version 1.0.2",log.info)
+  log.log("Version 1.0.3",log.info)
   log.log(`logged in as ${client.user.tag}`, log.info)
   setUpCommands()
   log.log('BOT is ready', log.info)
