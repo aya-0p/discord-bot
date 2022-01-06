@@ -100,7 +100,7 @@ client.on('messageCreate', (message) => { //メッセージが作られたとき
     return;
   }
   if (process.env.logall === "true") {
-    log.log(`by ${message.author.username} at ${message.createdAt.toFormat("YYYY年MM月DD日HH24時MI分SS秒")} in ${message.channel.name},\n${message.content}`, log.message)
+    log.log(`by ${message.author.username} at ${message.createdAt.toFormat("YYYY年MM月DD日HH24時MI分SS秒")} in ${message.channel.name},${message.guild.name},\n${message.content}`, log.message)
     /**
      * @type {Array<URL>}
      */

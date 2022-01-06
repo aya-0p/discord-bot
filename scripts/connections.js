@@ -89,7 +89,7 @@ async function generateAudio() {
  * @param {String} text メッセージ
  */
 async function saveAndSpeak(data,text,serverid) {
-  const fileName = (new Date()).toFormat("YYYY-MM-DD_HH24-MI-SS");
+  const fileName = Math.floor(Math.random() * 100).toString() + (new Date()).toFormat("YYYY-MM-DD_HH24-MI-SS");
   log.log(`\x1b[2mgenerated audio, ${text.substring(0, 10)}...\x1b[0m => tmp\\${fileName}.wav`,log.audio)
   fs.writeFileSync(`tmp/${fileName}.wav`, new Buffer.from(data), 'binary')
   ffmpeg(`tmp/${fileName}.wav`)
