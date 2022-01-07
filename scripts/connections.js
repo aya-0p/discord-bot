@@ -270,14 +270,19 @@ module.exports = {
     if (read[interaction.guildId]?.connecting) {
       if (read[interaction.guildId].musicPlaying) {
         interaction.reply({ content: `すでに再生しています`, ephemeral: true, });
-        return false
+        return
       }
     } else {
-      if(!await voiceChannelConnect(interaction)) return false
+      if (!await voiceChannelConnect(interaction)) return
+      read[interaction.guildId].musicPlaying = true
+      read[interaction.guildId].musicPlayContinue = true
+      interaction.followUp({ content: `音楽を再生します...`, })
+      musicPlay(interaction)
+      return
     }
     read[interaction.guildId].musicPlaying = true
     read[interaction.guildId].musicPlayContinue = true
-    interaction.followUp({ content: `音楽を再生します...`, })
+    interaction.reply({ content: `音楽を再生します...`, })
     musicPlay(interaction)
   },
   /**
@@ -287,7 +292,7 @@ module.exports = {
   async skip(interaction) {
     if (read[interaction.guildId].connecting && read[interaction.guildId].musicPlaying) {
       interaction.reply({ content: `スキップします。`, ephemeral: true, })
-      soundSkip()
+      soundSkip(interaction)
     } else {
       interaction.reply({ content: `ボイスチャンネルに接続されていないか、何も再生していません。`, ephemeral: true, })
     }
