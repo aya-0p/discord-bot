@@ -3,7 +3,7 @@
  * @typedef {discordjs_Message} Message https://discord.js.org/#/docs/main/stable/class/Message
  */
 const log = require("./log")
-const { joinVoiceChannel, entersState, createAudioResource, StreamType, createAudioPlayer, AudioPlayerStatus, NoSubscriberBehavior } = require("@discordjs/voice");
+const { VoiceConnectionStatus, joinVoiceChannel, entersState, createAudioResource, StreamType, createAudioPlayer, AudioPlayerStatus, NoSubscriberBehavior } = require("@discordjs/voice");
 const {default:axios} = require("axios");
 const ffmpeg = require('fluent-ffmpeg')
 ffmpeg.setFfmpegPath(require('ffmpeg-static'));
@@ -11,7 +11,6 @@ require('ffmpeg-static')
 require('date-utils')
 const fs = require("fs-extra")
 const dotenv = require("dotenv");
-const { interaction } = require("./log");
 dotenv.config();
 const rpc = axios.create({ baseURL: process.env.voicevox_url, proxy: false });
 /**
@@ -89,7 +88,7 @@ async function generateAudio() {
  * @param {String} text メッセージ
  */
 async function saveAndSpeak(data,text,serverid) {
-  const fileName = Math.floor(Math.random() * 100).toString() + (new Date()).toFormat("YYYY-MM-DD_HH24-MI-SS");
+  const fileName = Math.floor(Math.random() * 10000).toString() +"_"+ (new Date()).toFormat("YYYY-MM-DD_HH24-MI-SS");
   log.log(`\x1b[2mgenerated audio, ${text.substring(0, 10)}...\x1b[0m => tmp\\${fileName}.wav`,log.audio)
   fs.writeFileSync(`tmp/${fileName}.wav`, new Buffer.from(data), 'binary')
   ffmpeg(`tmp/${fileName}.wav`)
@@ -148,7 +147,8 @@ async function voiceChannelConnect(interaction) {
     reading: false,
     musicPlaying: false,
     musicPlayContinue: false,
-    musicPlayList: []
+    musicPlayList: [],
+    connectingVoiceChannel: memberVC
   }
   interaction.reply({ content: "接続しました。", ephemeral: true, });
   read[interaction.guildId].connection.subscribe(read[interaction.guildId].audioPlayer);
@@ -194,6 +194,27 @@ async function soundSkip(interaction) {
   read[interaction.guildId].audioPlayer.play(resource);
 }
 /**
+ * ボイスチャンネルへの接続状況を確認して、接続不要なら切断する
+ * @param {Message} message discordjsのMessage Class
+ */
+async function checkConnection(message) {
+  const vCStatus = read[message.guildId]?.connection?.state?.status
+  if (vCStatus === VoiceConnectionStatus.Destroyed || vCStatus === VoiceConnectionStatus.Disconnected || vCStatus === undefined) {
+    destroyConnection(message)
+  } else {
+    if (!read[message.guildId]?.connectingVoiceChannel?.members.filter(member => !member.user.bot).size) destroyConnection(message)
+  }
+}
+/**
+ * ボイスチャンネルから強制切断
+ * @param {Message} message discordjsのMessage Class
+ */
+async function destroyConnection(message) {
+  read[message.guildId].connecting = false
+  try { read[message.guildId].connection.destroy() } catch { () => { } }
+  log.log(`connection destroyed forcibly at${message.guild.name}`, log.audio)
+}
+/**
  * ボイスチャンネル用モジュール
  */
 module.exports = {
@@ -226,6 +247,7 @@ module.exports = {
    * @returns {undefined} 無し
    */
   async readMessage(message) {
+    if (read[message.guildId]?.connecting) await checkConnection(message)
     if (read[message.guildId]?.readingChannel !== message.channelId || !read[message.guildId]?.connecting) return
     generateReadMessage(message).forEach(e => {
       read.readText.push(message)
