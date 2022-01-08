@@ -140,3 +140,6 @@ client.on("interactionCreate", async (interaction) => { //interaction
 testFiles()
 log.log("------------------------------\n---------SCRIPT STARTED-------\n------------------------------", log.info);
 client.login(process.env.token); //ログイン
+process.on('unhandledRejection', (reason, p) => {
+  log.log(`Error at ${p},reason:\n${reason}`)
+})
