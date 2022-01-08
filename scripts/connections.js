@@ -66,9 +66,12 @@ function generateReadMessage(message) {
 async function generateAudio() {
   read.audioGenerateing = true
   const text = read.readText[0]
-  if (text?.content && text?.author.id) {
-    const voiceId = require("../jsons/settings.json").voice[text.author.id] ?? require("../jsons/settings.json").voice.default
-    const audio_query = await rpc.post('audio_query?text=' + encodeURI(text.content) + "&speaker=" + voiceId);
+  const content = text.content
+  const author = text.author
+  const guildId = text.guildId
+  if (content && author) {
+    const voiceId = require("../jsons/settings.json").voice[author] ?? require("../jsons/settings.json").voice.default
+    const audio_query = await rpc.post('audio_query?text=' + encodeURI(content) + "&speaker=" + voiceId);
     const synthsis = await rpc.post("synthesis?speaker=" + voiceId, JSON.stringify(audio_query.data), {
       responseType: 'arraybuffer',
       headers: {
@@ -76,8 +79,8 @@ async function generateAudio() {
         "Content-Type": "application/json"
       }
     });
-    log.log(`generated audio,\n${text.content}`,log.audio)
-    saveAndSpeak(synthsis.data, text.content, text.guildId)
+    log.log(`generated audio,\n${content}`,log.audio)
+    saveAndSpeak(synthsis.data, content, guildId)
   }
   read.readText.shift()
   if (read.readText.length === 0) { read.audioGenerateing = false} else {generateAudio()}
@@ -250,7 +253,7 @@ module.exports = {
     if (read[message.guildId]?.connecting) await checkConnection(message)
     if (read[message.guildId]?.readingChannel !== message.channelId || !read[message.guildId]?.connecting) return
     generateReadMessage(message).forEach(e => {
-      read.readText.push(message)
+      read.readText.push({content: e,author: message.author.id,guildId: message.guildId})
     })
     if (!read.audioGenerateing) {generateAudio()}
   },
@@ -270,19 +273,14 @@ module.exports = {
     if (read[interaction.guildId]?.connecting) {
       if (read[interaction.guildId].musicPlaying) {
         interaction.reply({ content: `すでに再生しています`, ephemeral: true, });
-        return
+        return false
       }
     } else {
-      if (!await voiceChannelConnect(interaction)) return
-      read[interaction.guildId].musicPlaying = true
-      read[interaction.guildId].musicPlayContinue = true
-      interaction.followUp({ content: `音楽を再生します...`, })
-      musicPlay(interaction)
-      return
+      if(!await voiceChannelConnect(interaction)) return false
     }
     read[interaction.guildId].musicPlaying = true
     read[interaction.guildId].musicPlayContinue = true
-    interaction.reply({ content: `音楽を再生します...`, })
+    interaction.followUp({ content: `音楽を再生します...`, })
     musicPlay(interaction)
   },
   /**
@@ -292,7 +290,7 @@ module.exports = {
   async skip(interaction) {
     if (read[interaction.guildId].connecting && read[interaction.guildId].musicPlaying) {
       interaction.reply({ content: `スキップします。`, ephemeral: true, })
-      soundSkip(interaction)
+      soundSkip()
     } else {
       interaction.reply({ content: `ボイスチャンネルに接続されていないか、何も再生していません。`, ephemeral: true, })
     }
