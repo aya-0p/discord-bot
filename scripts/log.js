@@ -12,33 +12,35 @@ module.exports = {
    * @param {String} data ログを残す文字列
    * @param {String} status ログのステータス(debug,info,warning,error,audio,message,interaction,attachments)
    */
-  log(data, status) {
-    switch (status) {
+  log(data, status_) {
+    let status
+    switch (status_) {
       case "debug":
-        status = `\u001b[36m${status}`
+        status = `\u001b[36m${status_}`
         break;
       case "info":
-        status = `\u001b[32m${status}`
+        status = `\u001b[32m${status_}`
         break;
       case "warning":
-        status = `\u001b[33m${status}`
+        status = `\u001b[33m${status_}`
         break;
       case "error":
-        status = `\u001b[31m${status}`
+        status = `\u001b[31m${status_}`
         break;
       case "audio":
-        status = `\u001b[35m${status}`
+        status = `\u001b[35m${status_}`
         break;
       case "message":
-        status = `\u001b[35m${status}`
+        status = `\u001b[35m${status_}`
         break;
       case "interaction":
-        status = `\u001b[35m${status}`
+        status = `\u001b[35m${status_}`
         break;
       case "attachments":
-        status = `\u001b[35m${status}`
+        status = `\u001b[35m${status_}`
         break;
       default:
+        status = status_
         break;
     }
     /**
@@ -64,9 +66,10 @@ module.exports = {
       try {
         /**
          * @type {String} 保存用ログ内容
-         */
-        let logSave = `${theDate} | ${status}: (${(i + 1).toString().padStart(2, "0")}/${splitedDatas.length.toString().padStart(2, "0")}) ${splitedDatas[i].replaceAll(/\x1b\[../g, "")}`
-        fs.appendFileSync('.log', `${logSave}\n`, 'utf8')
+        */
+        let logSave = `${theDate} | ${status_}: (${(i + 1).toString().padStart(2, "0")}/${splitedDatas.length.toString().padStart(2, "0")}) ${splitedDatas[i].replaceAll(/\x1b\[../g, "")}`
+        try { fs.appendFileSync(`./logs/${status_}.log`, `${logSave}\n`, 'utf8') } catch { fs.writeFileSync(`./logs/${status_}.log`, `${logSave}\n`, 'utf8')}
+        fs.appendFileSync(`./logs/.log`, `${logSave}\n`, 'utf8')
       } catch (err) {
         console.log(err)
       }

@@ -27,6 +27,7 @@ const log = require("./scripts/log")
 const replys = require("./scripts/autoreply")
 const { download } = require("./scripts/download")
 const connections = require('./scripts/connections');
+const cron = require('node-cron');
 /**
  * 初期セットアップ
  */
@@ -52,21 +53,9 @@ function testFiles() {
    */
   try { require("./jsons/settings.json") } catch { fs.writeFileSync('jsons/settings.json', '{"voice":{"default":1},"replaces":{"text":[],"regex":[]}}', 'utf8') }
   /**
-   * .envの存在確認
-   */
-  /*
-  try { require("./.env") } catch {
-    log.log(".envが存在しません\nsetup.batを実行してください", log.error);
-    process.exit(1)
-  }*/
-  /**
    * replys.jsonの存在確認
    */
   try { require("./jsons/replys.json") } catch { fs.writeFileSync('jsons/replys.json', '[]', 'utf8') }
-  /**
-   * .logの存在確認
-   */
-  try { require("./.log") } catch { fs.writeFileSync('.log', '', 'utf8') }
 }
 /**
  * コマンドを設定する関数
@@ -141,5 +130,14 @@ testFiles()
 log.log("------------------------------\n---------SCRIPT STARTED-------\n------------------------------", log.info);
 client.login(process.env.token); //ログイン
 process.on('unhandledRejection', (reason, p) => {
-  log.log(`Error at ${p},reason:\n${reason}`)
+  log.log(`Error at ${p},reason:\n${reason}`,log.error)
 })
+cron.schedule('*/5 * * * * *', () => {
+  try {
+    const t = new Date()
+    client.user.setActivity(t.toFormat("最終更新 HH24:MI:SS"), {type: 'PLAYING' });
+  } catch {
+    log.log("Setting Error", log.error)
+  }
+});
+
