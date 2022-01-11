@@ -196,12 +196,13 @@ async function checkConnection() {
   read.connectionList.forEach(e => {
     const vCStatus = read[e]?.connection?.state?.status
     if (vCStatus === VoiceConnectionStatus.Destroyed || vCStatus === VoiceConnectionStatus.Disconnected) {
-      destroyConnection(read[e])
+      destroyConnection(read[e]);return
     } else if (vCStatus !== undefined) {
       if (!read[e]?.connectingVoiceChannel?.members.filter(member => !member.user.bot).size) {
-        destroyConnection(read[e])
+        destroyConnection(read[e]);return
       }
     }
+    read[e].connectionErrors = 0
   })
 }
 /**
