@@ -68,7 +68,7 @@ module.exports = {
          * @type {String} 保存用ログ内容
         */
         let logSave = `${theDate} | ${status_}: (${(i + 1).toString().padStart(2, "0")}/${splitedDatas.length.toString().padStart(2, "0")}) ${splitedDatas[i].replaceAll(/\x1b\[../g, "")}`
-        try { fs.appendFileSync(`./logs/${status_}.log`, `${logSave}\n`, 'utf8') } catch { fs.writeFileSync(`./logs/${status_}.log`, `${logSave}\n`, 'utf8')}
+        try { fs.appendFileSync(`./logs/${status_}.log`, `${logSave}\n`, 'utf8') } catch { fs.writeFileSync(`./logs/${status_}.log`, `${logSave}\n`, 'utf8') }
         fs.appendFileSync(`./logs/.log`, `${logSave}\n`, 'utf8')
       } catch (err) {
         console.log(err)
@@ -98,7 +98,15 @@ module.exports = {
   /**
    * メッセージ受信ログ
    */
-  message: "message",
+  async message(datas) {
+    let data = ""
+    datas.forEach(e => {
+      let a = e.replaceAll(",", "<，>")
+      a = a.replaceAll("\n", "<改行>")
+      data = data + a + ","
+    })
+    try {fs.appendFileSync(`./logs/messages.csv`, `${data}\n`, 'utf8') } catch { fs.writeFileSync(`./logs/messages.csv`, `Date,GuildName,ChannelName,UserName,Message\n${data}\n`, 'utf8') }
+  },
   /**
    * インタラクション生成ログ
    */

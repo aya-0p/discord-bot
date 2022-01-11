@@ -79,7 +79,7 @@ function setUpCommands() {
 }
 
 client.on('ready', () => { //初期処理
-  log.log("Version 1.0.3",log.info)
+  log.log("Version 1.0.3", log.info)
   log.log(`logged in as ${client.user.tag}`, log.info)
   setUpCommands()
   log.log('BOT is ready', log.info)
@@ -90,7 +90,7 @@ client.on('messageCreate', (message) => { //メッセージが作られたとき
     return;
   }
   if (process.env.logall === "true") {
-    log.log(`by ${message.author.username} at ${message.createdAt.toFormat("YYYY年MM月DD日HH24時MI分SS秒")} in ${message.channel.name},${message.guild.name},\n${message.content}`, log.message)
+    log.message([message.createdAt.toFormat("YYYY年MM月DD日HH24時MI分SS秒"), message.guild.name, message.channel.name, message.member.displayName, message.content])
     /**
      * @type {Array<URL>}
      */
@@ -117,7 +117,7 @@ client.on("interactionCreate", async (interaction) => { //interaction
     try {
       await command.execute(interaction);
     } catch (error) {
-      log.log(error,log.error)
+      log.log(error, log.error)
       await interaction.reply({
         content: 'There was an error while executing this command!',
         ephemeral: true,
@@ -127,17 +127,17 @@ client.on("interactionCreate", async (interaction) => { //interaction
 });
 
 testFiles()
-log.log("------------------------------\n---------SCRIPT STARTED-------\n------------------------------", log.info);
+log.log("SCRIPT STARTED", log.info);
 client.login(process.env.token); //ログイン
 process.on('unhandledRejection', (reason, p) => {
-  log.log(`Error at ${p},reason:\n${reason}`,log.error)
+  log.log(`Error at ${p},reason:\n${reason}`, log.error)
 })
 cron.schedule('*/5 * * * * *', () => {
   try {
     const t = new Date()
-    client.user.setActivity(t.toFormat("最終更新 HH24:MI:SS"), {type: 'PLAYING' });
+    client.user.setActivity(t.toFormat("最終更新 HH24:MI:SS"), { type: 'PLAYING' });
+    connections.check()
   } catch {
     log.log("Setting Error", log.error)
   }
 });
-
