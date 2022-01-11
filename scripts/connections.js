@@ -24,18 +24,9 @@ const read = {
   /**
    * @type {Boolean} 読み上げ音声を生成しているか
    */
-  audioGenerateing: false
+  audioGenerateing: false,
+  connectionList: []
 }
-
-
-
-
-
-
-/**
- * @type {Array<String>} 再生する音楽一覧(元)
- */
-const musicFiles = fs.readdirSync('musics').filter(file => file.endsWith('.mp3'))
 /**
  * discordから送られるメッセージを読み上げ用の文字列に変換する関数
  * @param {Message} message discordjsのMessage Class
@@ -151,8 +142,10 @@ async function voiceChannelConnect(interaction) {
     musicPlaying: false,
     musicPlayContinue: false,
     musicPlayList: [],
-    connectingVoiceChannel: memberVC
+    connectingVoiceChannel: memberVC,
+    connectionErrors: 0
   }
+  read.connectionList.push(interaction.guildId)
   interaction.reply({ content: "接続しました。", ephemeral: true, });
   read[interaction.guildId].connection.subscribe(read[interaction.guildId].audioPlayer);
   log.log(`connected to voice channel, ${member.voice.channel.name}`, log.info)
@@ -198,24 +191,30 @@ async function soundSkip(interaction) {
 }
 /**
  * ボイスチャンネルへの接続状況を確認して、接続不要なら切断する
- * @param {Message} message discordjsのMessage Class
  */
-async function checkConnection(message) {
-  const vCStatus = read[message.guildId]?.connection?.state?.status
-  if (vCStatus === VoiceConnectionStatus.Destroyed || vCStatus === VoiceConnectionStatus.Disconnected || vCStatus === undefined) {
-    destroyConnection(message)
-  } else {
-    if (!read[message.guildId]?.connectingVoiceChannel?.members.filter(member => !member.user.bot).size) destroyConnection(message)
-  }
+async function checkConnection() {
+  read.connectionList.forEach(e => {
+    const vCStatus = read[e]?.connection?.state?.status
+    if (vCStatus === VoiceConnectionStatus.Destroyed || vCStatus === VoiceConnectionStatus.Disconnected) {
+      destroyConnection(read[e])
+    } else if (vCStatus !== undefined) {
+      if (!read[e]?.connectingVoiceChannel?.members.filter(member => !member.user.bot).size) {
+        destroyConnection(read[e])
+      }
+    }
+  })
 }
 /**
- * ボイスチャンネルから強制切断
- * @param {Message} message discordjsのMessage Class
+ * 接続を強制切断
  */
-async function destroyConnection(message) {
-  read[message.guildId].connecting = false
-  try { read[message.guildId].connection.destroy() } catch { () => { } }
-  log.log(`connection destroyed forcibly at${message.guild.name}`, log.audio)
+function destroyConnection(connection) {
+  if (connection.connectionErrors > 3) {
+    connection.connecting = false
+    try { connection.connection.destroy() } catch { () => { } }
+    log.log("connection destroyed forcibly", log.info)
+  } else {
+    connection.connectionErrors++
+  }
 }
 /**
  * ボイスチャンネル用モジュール
@@ -250,7 +249,6 @@ module.exports = {
    * @returns {undefined} 無し
    */
   async readMessage(message) {
-    if (read[message.guildId]?.connecting) await checkConnection(message)
     if (read[message.guildId]?.readingChannel !== message.channelId || !read[message.guildId]?.connecting) return
     generateReadMessage(message).forEach(e => {
       read.readText.push({content: e,author: message.author.id,guildId: message.guildId})
@@ -262,7 +260,7 @@ module.exports = {
    * @returns {String} 変数文字列
    */
   async debug() {
-    return (read)
+    return ("")
   },
   /**
    * 音楽を再生する関数
@@ -311,5 +309,11 @@ module.exports = {
     } else {
       interaction.reply({ content: `ボイスチャンネルに接続されていません。`, ephemeral: true, })
     }
+  },
+  /**
+   * ボイスチャンネルの接続状況を確認
+   */
+  async check() {
+    await checkConnection()
   }
 }
