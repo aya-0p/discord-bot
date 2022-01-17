@@ -2,6 +2,7 @@
 botの使い方
 ここへのページ(https://github.com/*username*/discord-bot/blob/main/How-to-use.md)をbotの説明文に貼ると便利
  -->
+[利用規約](https://github.com/aya-0p/discord-bot/blob/main/利用規約等.md)への同意もお願いします。なお、基本の利用では問題ないはずです。
 # aya's bot<!-- 作者名 -->
 botの使い方です。  
 基本の機能は全てここに乗っているはず...  
