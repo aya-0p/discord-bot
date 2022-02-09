@@ -3,10 +3,10 @@ botの使い方
 ここへのページ(https://github.com/*username*/discord-bot/blob/main/How-to-use.md)をbotの説明文に貼ると便利
  -->
 [利用規約](https://github.com/aya-0p/discord-bot/blob/main/利用規約等.md)への同意もお願いします。なお、基本の利用では問題ないはずです。  
-[更新情報(Twitter)](https://twitter.com/ayas_bot)
+[更新情報(Twitter)](https://twitter.com/ayas_bot)  
+[そのほかの細かい情報](https://github.com/aya-0p/discord-bot/blob/main/other.md)
 # aya's bot<!-- 作者名 -->
 botの使い方です。  
-基本はすべてサーバー別で変わります。  
 基本の機能は全てここに乗っているはず...  
 (作者による隠し機能を除く...?)  
 ## 機能一覧
