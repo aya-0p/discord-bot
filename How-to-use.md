@@ -14,13 +14,13 @@ botの使い方です。
 - ボイスチャンネルで読み上げ  
 - メッセージURLからメッセージを表示  
 - 自動返信
-## /ay help
+## /help
 このページへのリンクを表示
-## /ay join
+## /join
 実行者が参加しているボイスチャンネルに参加、読み上げの開始
-## /ay disconnect
+## /disconnect
 ボイスチャンネルから退出
-## /ay read [before] [after] [regex]
+## /read [before] [after] [regex]
 ### before
 読み替える前の語(入力しないと読み替えリストを表示)
 ### after
@@ -29,20 +29,20 @@ botの使い方です。
 正規表現を利用する
 - True 使う
 - False 使わない（デフォルト）
-## /ay voice [id]
+## /voice [id]
 実行者の読み上げ音声を変更
 ### id
 読み上げ者名(VOICEVOXに存在するもののみ選択可)
-## /ay reply [search] [returnmsg]
+## /reply [search] [returnmsg]
 自動返信
 ### search
 反応する言葉(入力しないと反応リストを表示)
 ### returnmsg
 応答する言葉(入力しないと反応削除)
-## /ay settings
+## /settings
 設定の変更  
 詳細は実行後のテキストをご覧ください。
-## /ay report [type] [body]
+## /report [type] [body]
 Ayaへの報告
 ### type
 報告内容。「不具合」「要望」「その他」から選べます
